@@ -94,12 +94,13 @@
       <v-spacer/>
       <v-text-field
         class="mr-2"
-        clearable
         placeholder="Cari Buku"
+        prepend-inner-icon="search"
+        clear-icon="close"
+        clearable
         solo
         v-model="searchKey"
         @change="search"
-        prepend-inner-icon="search"
       ></v-text-field>
       <v-toolbar-items v-if="!isLogin">
         <v-btn flat to="/register">Register</v-btn>
