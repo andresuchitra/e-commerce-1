@@ -22,10 +22,14 @@
       <!-- Description tags, reviews, etc -->
       <v-tabs class="description-tabs" dark slider-color="yellow">
         <v-tab class="font-weight-bold" ripple>Description</v-tab>
+        <v-tab class="font-weight-bold" ripple>Comments</v-tab>
         <v-tab-item>
           <v-card flat>
             <v-card-text>{{ productDesc }}</v-card-text>
           </v-card>
+        </v-tab-item>
+        <v-tab-item>
+          <CommentList @addcomment="addComment" :comments="shopProduct.comments"></CommentList>
         </v-tab-item>
       </v-tabs>
     </v-layout>
@@ -33,13 +37,15 @@
 </template>
 <script>
 import Quantity from "@/components/Quantity.vue";
+import CommentList from '@/components/CommentList.vue'
 import commaFormat from "@/helpers/priceFormat.js";
 import api from "@/api/backend.js";
 
 export default {
   props: ["mode"],
   components: {
-    Quantity
+    Quantity,
+    CommentList,
   },
   data() {
     return {
@@ -69,6 +75,17 @@ export default {
     this.fetchData();
   },
   methods: {
+    addComment(newComment) {
+      api.patch(`products/${this.shopProduct._id}/addComment`, {content: newComment}, {
+          headers: { Authorization: localStorage.ecomm_token }
+        })
+        .then(({ data }) => {
+          console.log(data);
+          this.shopProduct.comments = [...data.comments]
+          console.log(this.shopProduct);
+          swal.fire('Success', `Comment added. Thank you!` , 'success');
+        })
+    },
     addToCart() {
       if(this.internalProduct.quantity > this.internalProduct.stock) {
         swal.fire('AddCartItem Error', `Quantity requested more than current stock!` , 'error');

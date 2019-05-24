@@ -16,11 +16,14 @@ const productSchema = new Schema({
         default: 0,
     },
     image: String,
-    // tags: [{type: Schema.Types.ObjectId, ref: 'Tag'}],
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
+    comments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Comment'
+    }]
 })
 
 const Product = mongoose.model('Product', productSchema)

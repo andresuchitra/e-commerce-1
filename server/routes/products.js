@@ -2,6 +2,7 @@ const route = require('express').Router()
 const ProductController = require('../controllers/productsController')
 const authenticate = require('../middlewares/authenticate')
 const authorizeProduct = require('../middlewares/authorizeProduct')
+const authorizeComment = require('../middlewares/authorizeComment')
 const {multer, sendUploadToGCS} = require('../helpers/images')
 
 route.get('/', ProductController.findAll)
@@ -10,6 +11,8 @@ route.get('/:id', ProductController.findOne)
 
 route.use('/', authenticate)
 
+route.patch('/:id/addComment', ProductController.addComment)
+route.patch('/:id/deleteComment/:commentId', authorizeComment, ProductController.deleteComment)
 route.post('/',  multer.single('image'), sendUploadToGCS,  ProductController.create)
 route.put('/:id', authorizeProduct, ProductController.update)
 route.patch('/:id', authorizeProduct, ProductController.update)
