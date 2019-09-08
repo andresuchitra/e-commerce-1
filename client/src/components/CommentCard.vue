@@ -1,7 +1,7 @@
 <template>
   <v-layout row pa-2 mt-2>
       <v-avatar class="mr-2">
-        <img style="background-color: white;" :src="image" alt="comment.author.firstname">
+        <img style="background-color: white;" :src="image" :alt="comment.author.firstname">
       </v-avatar>
       <v-layout wrap column justify-center>
           <div class="subheading font-weight-bold">{{ comment.content }}</div>
@@ -17,7 +17,7 @@ export default {
   computed: {
       image() {
           if(!this.comment.author.image) {
-              this.comment.author.image = 'https://storage.googleapis.com/miniwp.andresuchitra.com/img/user.png'
+              this.comment.author.image = 'https://s3-ap-southeast-1.amazonaws.com/bukuberkah.andresuchitra.com/img/user.png'
           }
 
           return this.comment.author.image

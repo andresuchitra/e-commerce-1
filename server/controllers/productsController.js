@@ -39,7 +39,7 @@ class ProductController {
             product.image = req.file.location
         }
         else {
-            product.image = "https://storage.googleapis.com/miniwp-images/user.png"
+            product.image = process.env.USER_DEFAULT
         }
 
         Product.create(product)
