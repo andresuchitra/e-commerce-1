@@ -36,7 +36,7 @@ class ProductController {
         }
 
         if(req.file) {
-            product.image = req.file.cloudStoragePublicUrl
+            product.image = req.file.location
         }
         else {
             product.image = "https://storage.googleapis.com/miniwp-images/user.png"
@@ -61,7 +61,7 @@ class ProductController {
     }
     static update(req, res) {
         if(req.file) {
-            req.body.image = req.file.cloudStoragePublicUrl
+            req.body.image = req.file.location
         }
         Product.update({_id: req.params.id}, req.body, {new: true})
             .then(product => {
