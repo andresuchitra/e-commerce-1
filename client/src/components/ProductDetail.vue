@@ -76,15 +76,20 @@ export default {
   },
   methods: {
     addComment(newComment) {
-      api.patch(`products/${this.shopProduct._id}/addComment`, {content: newComment}, {
-          headers: { Authorization: localStorage.ecomm_token }
-        })
-        .then(({ data }) => {
-          console.log(data);
-          this.shopProduct.comments = [...data.comments]
-          console.log(this.shopProduct);
-          swal.fire('Success', `Comment added. Thank you!` , 'success');
-        })
+      if(this.$store.state.isLogin) {
+        api.patch(`products/${this.shopProduct._id}/addComment`, {content: newComment}, {
+            headers: { Authorization: localStorage.ecomm_token }
+          })
+          .then(({ data }) => {
+            console.log(data);
+            this.shopProduct.comments = [...data.comments]
+            console.log(this.shopProduct);
+            swal.fire('Success', `Comment added. Thank you!` , 'success');
+          })
+      }
+      else {
+        swal.fire('Error', `Please login first!` , 'error');
+      }
     },
     addToCart() {
       if(this.internalProduct.quantity > this.internalProduct.stock) {
