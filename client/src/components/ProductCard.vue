@@ -14,7 +14,6 @@
         <v-btn absolute color="yellow" class="grey--text" fab large right top @click="addToCart">
           <v-icon>shopping_cart</v-icon>
         </v-btn>
-        <!-- <router-link :to="`/products/${product._id}`"><div class="font-weight-light grey--text title mb-2">Fiqh</div></router-link> -->
         <router-link :to="`/products/${product._id}`">
           <h3 class="grey--text mb-2">
            {{ product.name }}
@@ -85,5 +84,3 @@ a:link, a:active {
   text-decoration: none;
 }
 </style>
-
-

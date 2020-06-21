@@ -194,11 +194,9 @@ export default {
       this.$store.dispatch("getCurrentCart");
     }
 
-    //load Google Logout client
-    if (typeof gapi !== undefined) {
-      gapi.load("auth2", () => {
-        console.log("gapi load...");
-        gapi.auth2.init();
+    if (window.gapi) {
+      window.gapi.load('auth2', () => {
+        window.gapi.auth2.init({ client_id: process.env.VUE_APP_GOOGLE_CLIENT_ID });
       });
     }
   },
@@ -230,16 +228,18 @@ export default {
     signOut() {
       var auth2;
       const self = this;
-      self.processSignOut();
 
       if (gapi) {
         auth2 = gapi.auth2.getAuthInstance();
         auth2.signOut().then(function() {
-          //
+          self.processSignOut();
+        })
+        .catch(e => {
+          swal.fire("Error", e, "error")
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

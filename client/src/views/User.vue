@@ -10,13 +10,18 @@
   </v-container>
 </template>
 <script>
+import { mapState } from 'vuex';
+
 export default {
-  props: ["user"],
+  props: ['user', 'selected'],
   mounted() {
-    if (!this.$props.user) {
-      this.$router.push("/login");
+    if (!this.$props.user && !this.isLogin) {
+      this.$router.push('/login');
     }
-  }
+  },
+  computed: {
+    ...mapState(['isLogin']),
+  },
 };
 </script>
 <style scoped>

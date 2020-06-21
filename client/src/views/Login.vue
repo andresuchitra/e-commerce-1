@@ -62,103 +62,110 @@
 </style>
 
 <script>
-import api from '../api/backend.js'
+import { mapState } from 'vuex';
+import api from '../api/backend'
 
 export default {
-    data() {
-        return {
-            isGoogleLogin: false,
-            linkedinCode: null,
-            formData: {
-              email: '',
-              password: '',
-            }
-        }
-    },
-    mounted() {
-      //load Google Logout client
-      if (typeof gapi !== undefined) {
-        gapi.load("auth2", () => {
-          console.log("gapi load...");
-          gapi.auth2.init();
-        });
-      }
-      
-      this.linkedinCode = this.$route.query.code;
-      console.log('linkedin arrive...', this.$route.query);
-      
-      /**
-       * handle callback from Linkedin when request code is available
-       * then we request our backend to get access token from Linkedin 
-       * */
-      
-      if(this.linkedinCode) {
-        api.get('/auth/linkedin/redirect/?code='+this.linkedinCode)
-          .then(({data}) => {
-            swal.fire('Login Success!', `Welcome, ${data.user.firstname}`, 'success')
-            localStorage.setItem('ecomm_token', data.access_token)
-            this.$store.commit('setUser', data.user)
-            this.$store.commit('setIsLogin', true)
-            this.$store.dispatch('getCurrentCart');
-            this.$router.push('/')
-          })
-          .catch(({response}) => {
-            swal.fire('Oops!', response.data, 'error')
-          })
-      }
-      gapi.signin2.render('google-signin-button', {
-          'scope': 'profile email',
-          'width': 200,
-          'height': 50,
-          'font-size': 12,
-          'theme': 'dark',
-          'onsuccess': this.onGoogleSignIn
-      })
-
-    },
-    computed: {
-      linkedInCodeRequestURL() {
-        return `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.VUE_APP_LINKEDIN_CLIENT_ID}&redirect_uri=${process.env.VUE_APP_LINKEDIN_REDIRECT_URI}&scope=r_liteprofile%20r_emailaddress%20w_member_social`
-      }
-    },
-    methods: {
-        processSignIn() {
-          api.post('/auth/login', this.formData)
-                .then(({data}) => {
-                    swal.fire('Nice!', `Welcome, ${data.user.firstname}`, 'success')
-                    localStorage.setItem('ecomm_token', data.access_token)
-                    this.$store.commit('setUser', data.user)
-                    this.$store.commit('setIsLogin', true)
-                    this.$router.push('/')
-                })
-                .catch((err) => {
-                    if(err.response) {
-                      swal.fire('Oops!', err.response.data, 'error')
-                    }
-                    else {
-                      swal.fire('Oops!', err, 'error')
-
-                    }
-                })
-        },
-        onGoogleSignIn (user) {
-            const profile = user.getBasicProfile();
-            const idToken = user.getAuthResponse().id_token;
-            this.isGoogleLogin = true;
-
-            // call backend for google sign in
-            api.post('/auth/google', {token: idToken})
-                .then(({data}) => {
-                    swal.fire('Nice!', `Welcome, ${profile.getName()}`, 'success')
-                    localStorage.setItem('ecomm_token', data.access_token)
-                    this.$store.commit('setUser', data.user)
-                    this.$store.commit('setIsLogin', true)
-                    this.$router.push('/')
-                })
-                .catch(({response}) => {
-                    swal.fire('Oops!', response.data, 'error')
-                })
-        }
+  data() {
+    return {
+      isGoogleLogin: false,
+      linkedinCode: null,
+      formData: {
+        email: '',
+        password: '',
+      },
     }
+  },
+  mounted() {
+    if (this.isLogin) {
+      debugger
+      this.$router.push('/');
+      return;
+    }
+
+    // load Google Logout client
+    if (gapi) {
+      gapi.load("auth2", () => {
+        gapi.auth2.init({ client_id: process.env.VUE_APP_GOOGLE_CLIENT_ID });
+        gapi.signin2.render(
+          'google-signin-button', {
+            'scope': 'profile email',
+            'width': 200,
+            'height': 50,
+            'font-size': 12,
+            'theme': 'dark',
+            'onsuccess': this.onGoogleSignIn
+          },
+        );
+      });
+    }
+
+    this.linkedinCode = this.$route.query.code;
+    
+    /**
+     * handle callback from Linkedin when request code is available
+     * then we request our backend to get access token from Linkedin 
+     * */
+    
+    if (this.linkedinCode) {
+      api.get('/auth/linkedin/redirect/?code='+this.linkedinCode)
+        .then(({data}) => {
+          swal.fire('Login Success!', `Welcome, ${data.user.firstname}`, 'success')
+          localStorage.setItem('ecomm_token', data.access_token)
+          this.$store.commit('setUser', data.user)
+          this.$store.commit('setIsLogin', true)
+          this.$store.dispatch('getCurrentCart');
+          this.$router.push('/')
+        })
+        .catch(({response}) => {
+          swal.fire('Error signing in to Linkedin', 'Please try login again', 'error')
+        })
+    }
+  },
+  computed: {
+    linkedInCodeRequestURL() {
+      return `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.VUE_APP_LINKEDIN_CLIENT_ID}&redirect_uri=${process.env.VUE_APP_LINKEDIN_REDIRECT_URI}&scope=r_liteprofile%20r_emailaddress%20w_member_social`
+    },
+    ...mapState(['isLogin']),
+  },
+  methods: {
+    processSignIn() {
+      api.post('/auth/login', this.formData)
+      .then(({data}) => {
+          swal.fire('Nice!', `Welcome, ${data.user.firstname}`, 'success')
+          localStorage.setItem('ecomm_token', data.access_token)
+          this.$store.commit('setUser', data.user)
+          this.$store.commit('setIsLogin', true)
+          this.$router.push('/')
+      })
+      .catch((err) => {
+          if(err.response) {
+            swal.fire('Oops!', err.response.data, 'error')
+          }
+          else {
+            swal.fire('Oops!', err, 'error')
+
+          }
+      })
+    },
+    onGoogleSignIn(user) {
+      const profile = user.getBasicProfile();
+      const idToken = user.getAuthResponse().id_token;
+      this.isGoogleLogin = true;
+
+      // call backend for google sign in
+      api.post('/auth/google', { token: idToken })
+        .then(({ data }) => {
+          swal.fire('Nice!', `Welcome, ${profile.getName()}`, 'success')
+          localStorage.setItem('ecomm_token', data.access_token)
+          this.$store.commit('setUser', data.user)
+          this.$store.commit('setIsLogin', true)
+          this.$router.push('/')
+        })
+        .catch(({ response }) => {
+          swal.fire('Oops!', response.data, 'error')
+        })
+    },
+  },
 };
 </script>

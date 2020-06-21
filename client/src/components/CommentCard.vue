@@ -16,9 +16,9 @@ export default {
   props: ["comment"],
   computed: {
       image() {
-          if(!this.comment.author.image) {
-              this.comment.author.image = 'https://s3-ap-southeast-1.amazonaws.com/bukuberkah.andresuchitra.com/img/user.png'
-          }
+        if (!this.comment.author.image) {
+          this.comment.author.image = 'https://s3-ap-southeast-1.amazonaws.com/bukuberkah.andresuchitra.com/img/user.png'
+        }
 
           return this.comment.author.image
       },

@@ -64,6 +64,11 @@ export default new Router({
           name: 'user-transactions',
           component: () => import(/* webpackChunkName: "user-transactions" */ './views/Transactions.vue'),
         },
+        {
+          path: '',
+          name: 'default',
+          component: () => import(/* webpackChunkName: "user-profile" */ './components/UserDetail.vue'),
+        },
       ],
     },
     {
