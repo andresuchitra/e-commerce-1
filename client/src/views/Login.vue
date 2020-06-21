@@ -35,7 +35,6 @@
                         <h4>Or login with:</h4>
                     </v-flex>
                     <v-flex px-3>
-                      <!-- <div class="g-signin2" data-width="300" data-height="200" data-longtitle="true"></div> -->
                       <div id="google-signin-button" style="width: 100%;"></div>
                     </v-flex>
                     <v-flex px-3 pb-3>
@@ -77,6 +76,14 @@ export default {
         }
     },
     mounted() {
+      //load Google Logout client
+      if (typeof gapi !== undefined) {
+        gapi.load("auth2", () => {
+          console.log("gapi load...");
+          gapi.auth2.init();
+        });
+      }
+      
       this.linkedinCode = this.$route.query.code;
       console.log('linkedin arrive...', this.$route.query);
       
@@ -135,9 +142,9 @@ export default {
                 })
         },
         onGoogleSignIn (user) {
-            const profile = user.getBasicProfile()
+            const profile = user.getBasicProfile();
             const idToken = user.getAuthResponse().id_token;
-            this.isGoogleLogin = true
+            this.isGoogleLogin = true;
 
             // call backend for google sign in
             api.post('/auth/google', {token: idToken})
